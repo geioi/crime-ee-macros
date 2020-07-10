@@ -44,7 +44,7 @@ TEGEVUS_RAVI = '&tegevus=ravipaki'
 
 restock_cnt = 0
 item_craft_cnt = 0
-anvil_qty = '3'
+anvil_qty = '4'
 
 item_to_material_map = {'10': ['10'], '12': ['5'], '16': ['11'], '22': ['7', '11'], '25': ['5', '11'], '26': ['5', '7'], '27': ['5', '7'],
                         '28': ['5', '7', '11'], '29': ['5', '10'], '30': ['5', '10'], '33': ['4', '5', '7'], '35': ['4', '5', '8'],
@@ -121,38 +121,41 @@ def kasitoo(action, item_value, counter=0):
 
 
     while noCaptcha:
+        try:
+            if counter != 0:
+                while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error') and item_craft_cnt < counter:
+                    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
+                    item_craft_cnt += 1
+                    time.sleep(0.2)
 
-        if counter != 0:
-            while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error') and item_craft_cnt < counter:
-                WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
-                item_craft_cnt += 1
-                time.sleep(0.2)
+                if item_craft_cnt == counter:
+                    item_craft_cnt = 0
+                    return
+            else:
+                while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
+                    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
+                    time.sleep(0.2)
+                #driver.close()
 
-            if item_craft_cnt == counter:
-                item_craft_cnt = 0
-                return
-        else:
-            while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
-                WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
-                time.sleep(0.2)
-            #driver.close()
+            if (driver.find_elements_by_css_selector('p.message.error')):
+                print('materjal otsas')
+                restock(item_to_material_map[item_value])
+                kasitoo(action, item_value, counter)
 
-        if (driver.find_elements_by_css_selector('p.message.error')):
-            print('materjal otsas')
-            restock(item_to_material_map[item_value])
-            kasitoo(action, item_value, counter)
-
-        else:
-            print('captcha time')
-            guessed = False
-            while not guessed:
-                src_image = driver.find_element_by_id('captcha_img').get_attribute('src')
-                answer = getPictureAnswer(src_image)
-                driver.find_element_by_id('trivia_input').send_keys(answer)
-                time.sleep(1)
-                if captchaContainer.value_of_css_property('display') == 'none':
-                    guessed = True
-            #noCaptcha = False
+            else:
+                print('captcha time')
+                guessed = False
+                while not guessed:
+                    src_image = driver.find_element_by_id('captcha_img').get_attribute('src')
+                    answer = getPictureAnswer(src_image)
+                    driver.find_element_by_id('trivia_input').send_keys(answer)
+                    time.sleep(1)
+                    if captchaContainer.value_of_css_property('display') == 'none':
+                        guessed = True
+                #noCaptcha = False
+        except:
+            print('exception :(')
+            continue
 
     #print(driver.find_element_by_id('captcha_img').get_attribute('src'))
 
@@ -161,21 +164,23 @@ def ravim(action):
 
     time.sleep(1)
     captchaContainer = driver.find_element_by_id('captcha_container')
+    try:
+        while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
+            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
+            #meisterdaButton.click()
+            time.sleep(0.2)
 
-    while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
-        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
-        #meisterdaButton.click()
-        time.sleep(0.2)
-
-    print('captcha time')
-    guessed = False
-    while not guessed:
-        src_image = driver.find_element_by_id('captcha_img').get_attribute('src')
-        answer = getPictureAnswer(src_image)
-        driver.find_element_by_id('trivia_input').send_keys(answer)
-        time.sleep(1)
-        if captchaContainer.value_of_css_property('display') == 'none':
-            guessed = True
+        print('captcha time')
+        guessed = False
+        while not guessed:
+            src_image = driver.find_element_by_id('captcha_img').get_attribute('src')
+            answer = getPictureAnswer(src_image)
+            driver.find_element_by_id('trivia_input').send_keys(answer)
+            time.sleep(1)
+            if captchaContainer.value_of_css_property('display') == 'none':
+                guessed = True
+    except:
+        print('exception :(')
     #driver.close()
     #print(driver.find_element_by_id('captcha_img').get_attribute('src'))
 
@@ -200,29 +205,31 @@ def sepikoda(action, item_value):
 
 
     while noCaptcha:
+        try:
+            while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
+                WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
+                time.sleep(0.2)
+            # driver.close()
 
-        while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
-            time.sleep(0.2)
-        # driver.close()
+            if driver.find_elements_by_css_selector('p.message.error'):
+                print('materjal otsas')
+                kasitoo(TEGEVUS_AHI, weapon_to_item_map[item_value], counter=200)
+                sepikoda(action, item_value)
 
-        if driver.find_elements_by_css_selector('p.message.error'):
-            print('materjal otsas')
-            kasitoo(TEGEVUS_AHI, weapon_to_item_map[item_value], counter=200)
-            sepikoda(action, item_value)
-
-        else:
-            print('captcha time')
-            guessed = False
-            while not guessed:
-                src_image = driver.find_element_by_id('captcha_img').get_attribute('src')
-                answer = getPictureAnswer(src_image)
-                driver.find_element_by_id('trivia_input').send_keys(answer)
-                time.sleep(1)
-                if captchaContainer.value_of_css_property('display') == 'none':
-                    guessed = True
-
-            #noCaptcha = False
+            else:
+                print('captcha time')
+                guessed = False
+                while not guessed:
+                    src_image = driver.find_element_by_id('captcha_img').get_attribute('src')
+                    answer = getPictureAnswer(src_image)
+                    driver.find_element_by_id('trivia_input').send_keys(answer)
+                    time.sleep(1)
+                    if captchaContainer.value_of_css_property('display') == 'none':
+                        guessed = True
+        except:
+            print('exception :(')
+            continue
+                #noCaptcha = False
 
 
 #### END OF AUTOMATION TASKS ####
@@ -245,4 +252,5 @@ driver.find_element_by_id('password5').send_keys(Keys.RETURN)
 time.sleep(1)
 
 #restock(item_to_material_map['22'])
-sepikoda(TEGEVUS_ALAS, '6')
+#sepikoda(TEGEVUS_ALAS, '7')
+kasitoo(TEGEVUS_AHI, '26')
