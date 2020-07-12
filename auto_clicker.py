@@ -45,7 +45,7 @@ TEGEVUS_RAVI = '&tegevus=ravipaki'
 error_cnt = 0
 restock_cnt = 0
 item_craft_cnt = 0
-anvil_qty = '6'
+anvil_qty = '7'
 
 item_to_material_map = {'10': ['10'], '12': ['5'], '16': ['11'], '22': ['7', '11'], '25': ['5', '11'], '26': ['5', '7'], '27': ['5', '7'],
                         '28': ['5', '7', '11'], '29': ['5', '10'], '30': ['5', '10'], '33': ['4', '5', '7'], '35': ['4', '5', '8'],
@@ -85,11 +85,16 @@ def sendAPIRequest(image):
 def solveCaptcha(driver, captchaContainer):
     print('captcha time')
     guessed = False
+    wrongAnswerCounter = 0
     while not guessed:
+        if wrongAnswerCounter > 15:
+            driver.close()
+            exit()
         src_image = driver.find_element_by_id('captcha_img').get_attribute('src')
         answer = getPictureAnswer(src_image)
         driver.find_element_by_id('trivia_input').send_keys(answer)
-        time.sleep(2)
+        wrongAnswerCounter += 1
+        time.sleep(1)
         if captchaContainer.value_of_css_property('display') == 'none':
             guessed = True
 
@@ -100,10 +105,10 @@ def solveCaptcha(driver, captchaContainer):
 
 def restock(values):  #takes array of values to buy
     global restock_cnt
-    wait_time = 0.3
+    wait_time = 0.2
     print(values)
     for value in values:
-        while restock_cnt < 100: #it's a great, great number
+        while restock_cnt < 150: #it's a great, great number
             driver.get(base_url + ASUKOHT_SLUMM_TURG_CRFT + '&ese=' + value + '#x')
             time.sleep(wait_time)
             WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.NAME, 'purchcrafitem'))).click()
@@ -120,7 +125,6 @@ def kasitoo(action, item_value, counter=0):
     global item_craft_cnt, error_cnt
     noCaptcha = True
 
-
     driver.get(base_url + ASUKOHT_MAJA + action)
 
     time.sleep(1)
@@ -135,7 +139,7 @@ def kasitoo(action, item_value, counter=0):
     while noCaptcha:
         try:
             if counter != 0:
-                while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error') and item_craft_cnt < counter:
+                while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error') and item_craft_cnt < counter:
                     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
                     item_craft_cnt += 1
                     time.sleep(0.1)
@@ -144,12 +148,12 @@ def kasitoo(action, item_value, counter=0):
                     item_craft_cnt = 0
                     return
             else:
-                while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
+                while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
                     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
                     time.sleep(0.1)
                 #driver.close()
 
-            if (driver.find_elements_by_css_selector('p.message.error')):
+            if (driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error')):
                 print('materjal otsas')
                 restock(item_to_material_map[item_value])
                 kasitoo(action, item_value, counter)
@@ -157,9 +161,10 @@ def kasitoo(action, item_value, counter=0):
             else:
                 solveCaptcha(driver, captchaContainer)
                 #noCaptcha = False
-        except:
+        except Exception as error:
             error_cnt += 1
             print('exception nr ' + str(error_cnt) + ':(')
+            print(error)
             if error_cnt > 1000:
                 driver.close()
                 exit() #failsafe in case of infinite error
@@ -174,15 +179,16 @@ def ravim(action):
     time.sleep(1)
     captchaContainer = driver.find_element_by_id('captcha_container')
     try:
-        while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
+        while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
             WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
             #meisterdaButton.click()
             time.sleep(0.1)
 
         solveCaptcha(driver, captchaContainer)
-    except:
+    except Exception as error:
         error_cnt += 1
         print('exception nr ' + str(error_cnt) + ':(')
+        print(error)
         if error_cnt > 1000:
             driver.close()
             exit()  # failsafe in case of infinite error
@@ -192,7 +198,6 @@ def ravim(action):
 def sepikoda(action, item_value):
     global anvil_qty, error_cnt
     noCaptcha = True
-
 
     #item_value = 6 ( lvl 38 )
     driver.get(base_url + ASUKOHT_MAJA + action)
@@ -211,12 +216,12 @@ def sepikoda(action, item_value):
 
     while noCaptcha:
         try:
-            while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('p.message.error'):
+            while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
                 WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
                 time.sleep(0.1)
             # driver.close()
 
-            if driver.find_elements_by_css_selector('p.message.error'):
+            if driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
                 print('materjal otsas')
                 kasitoo(TEGEVUS_AHI, weapon_to_item_map[item_value], counter=5000)
                 sepikoda(action, item_value)
@@ -224,9 +229,10 @@ def sepikoda(action, item_value):
             else:
                 solveCaptcha(driver, captchaContainer)
 
-        except:
+        except Exception as error:
             error_cnt += 1
             print('exception nr ' + str(error_cnt) + ':(')
+            print(error)
             if error_cnt > 1000:
                 driver.close()
                 exit()  # failsafe in case of infinite error
@@ -253,6 +259,7 @@ driver.find_element_by_id('password5').send_keys(Keys.RETURN)
 
 time.sleep(1)
 
-#sepikoda(TEGEVUS_ALAS, '9')
-kasitoo(TEGEVUS_AHI, '28')
+sepikoda(TEGEVUS_ALAS, '11')
+#kasitoo(TEGEVUS_AHI, '25')
 #restock(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'])
+#restock(['5', '11'])
