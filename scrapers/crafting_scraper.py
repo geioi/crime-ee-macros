@@ -6,7 +6,7 @@ from utils import constants
 
 
 def extractIngredients(string, start='(', stop=')'):
-    return string[string.index(start) + 1:string.index(stop)]
+    return string[string.rindex(start) + 1:string.rindex(stop)]
 
 
 def scrapeCraftingInfo(driver, close_after=True):

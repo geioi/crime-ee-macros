@@ -9,3 +9,5 @@ item_to_ingredients_map_kasitoo = {}
 item_to_value_map_kasitoo = {}
 item_names_kasitoo = ['-No data found-']
 ingredient_to_kapp_map = {}
+
+stop_thread = False

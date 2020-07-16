@@ -10,6 +10,9 @@ import json
 from tkinter import *
 from os import path
 import time
+import threading
+
+from multiprocessing import Process
 
 from scrapers import crafting_scraper
 from scrapers import tavern_scraper
@@ -17,6 +20,7 @@ from utils import credentials_handler, constants, vars
 from house import crafting, blacksmithing, herbalism
 from tavern import barkeeping
 
+t = threading.Thread()
 
 def startDriverAndLogin(world='white'):
     global driver
@@ -38,11 +42,19 @@ def startDriverAndLogin(world='white'):
 
 def changeProcess():
     global driver
-    driver.get('https://www.google.com')
+    tab = getTabTitle()
+    print(tab)
+    if tab == 'Käsitöö':
+        getSelectionKasi(change=True)
+
+    elif tab == 'Joogimeister':
+        getSelectionJook()
 
 
 def stopProcess():
-    global driver
+    global driver, t
+    vars.stop_thread = True
+    t.join(2)
     driver.close()
     disableButtons()
 
@@ -84,17 +96,30 @@ def getSelectionJook():
     #startProcess()
 
 
-def getSelectionKasi():
-    global chosen_option
+def getSelectionKasi(change=False):
+    global chosen_option, t
     chosen_option = dropdown_kasitoo.get()
-    startDriverAndLogin()
+    if not change:
+        startDriverAndLogin()
+    elif change:
+        print('trying to change action')
+        print('new item to make: ' + chosen_option)
+        vars.stop_thread = True
+        t.join(2)
 
+    vars.stop_thread = False
     if chosen_option in vars.puit_map:
-        crafting.kasitoo(driver, constants.TEGEVUS_PUIT, chosen_option, token=token)
+        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_PUIT, chosen_option,), kwargs={'token': token})
+        t.start()
+        #crafting.kasitoo(driver, constants.TEGEVUS_PUIT, chosen_option, token=token)
     elif chosen_option in vars.tugi_map:
-        crafting.kasitoo(driver, constants.TEGEVUS_TUGI, chosen_option, token=token)
+        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_TUGI, chosen_option,), kwargs={'token': token})
+        t.start()
+        #crafting.kasitoo(driver, constants.TEGEVUS_TUGI, chosen_option, token=token)
     elif chosen_option in vars.ahi_map:
-        crafting.kasitoo(driver, constants.TEGEVUS_AHI, chosen_option, token=token)
+        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_AHI, chosen_option,), kwargs={'token': token})
+        t.start()
+        #crafting.kasitoo(driver, constants.TEGEVUS_AHI, chosen_option, token=token)
 
 
 def getTabTitle():
@@ -107,17 +132,21 @@ def saveCredButtonClicked():
 
 
 def getAllData():
+    startDriverAndLogin()
+
     crafting_scraper.scrapeCraftingInfo(driver, close_after=False)
     tavern_scraper.scrapeTavernData(driver)
     disableButtons()
 
 
 def getCraftingData():
+    startDriverAndLogin()
     crafting_scraper.scrapeCraftingInfo(driver)
     disableButtons()
 
 
 def getTavernData():
+    startDriverAndLogin()
     tavern_scraper.scrapeTavernData(driver)
     disableButtons()
 
