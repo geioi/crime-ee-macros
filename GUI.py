@@ -86,22 +86,42 @@ def enableButtons():
 
 
 def getSelectionJook(change=False):
-    global chosen_option
+    global chosen_option, t
     chosen_option = dropdown_joogimeister.get()
-    if chosen_option in data_joogid['kitchen_map']:
-        print('item is found in kitchen')
-    elif chosen_option in data_joogid['cellar_map']:
-        print('item is found in cellar')
-    elif chosen_option in data_joogid['aerator_map']:
-        print('item is found in aerator')
-    elif chosen_option in data_joogid['distiller_map']:
-        print('item is found in distiller')
-    elif chosen_option in data_joogid['cider_map']:
-        print('item is found in cider')
-    elif chosen_option in data_joogid['blender_map']:
-        print('item is found in blender')
+    if not change:
+        startDriverAndLogin()
+    elif change:
+        print('trying to change action to joogimeister')
+        print('new item to make: ' + chosen_option)
+        vars.stop_thread = True
+        t.join(2)
 
-    #startProcess()
+    vars.stop_thread = False
+
+    if chosen_option in vars.kitchen_map_jook:
+        t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_KITCHEN, chosen_option,),
+                             kwargs={'token': token})
+        t.start()
+    elif chosen_option in vars.cellar_map_jook:
+        t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_CELLAR, chosen_option,),
+                             kwargs={'token': token})
+        t.start()
+    elif chosen_option in vars.aerator_map_jook:
+        t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_AERATOR, chosen_option,),
+                             kwargs={'token': token})
+        t.start()
+    elif chosen_option in vars.distiller_map_jook:
+        t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_DISTILLER, chosen_option,),
+                             kwargs={'token': token})
+        t.start()
+    elif chosen_option in vars.cider_map_jook:
+        t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_CIDER, chosen_option,),
+                             kwargs={'token': token})
+        t.start()
+    elif chosen_option in vars.blender_map_jook:
+        t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_BLENDER, chosen_option,),
+                             kwargs={'token': token})
+        t.start()
 
 
 def getSelectionKasi(change=False):
@@ -110,7 +130,7 @@ def getSelectionKasi(change=False):
     if not change:
         startDriverAndLogin()
     elif change:
-        print('trying to change action from käsitöö')
+        print('trying to change action to käsitöö')
         print('new item to make: ' + chosen_option)
         vars.stop_thread = True
         t.join(2)
@@ -139,7 +159,7 @@ def getSelectionSepikoda(change=False):
     if not change:
         startDriverAndLogin()
     elif change:
-        print('trying to change action from sepikoda')
+        print('trying to change action to sepikoda')
         print('new item to make: ' + chosen_option)
         vars.stop_thread = True
         t.join(2)
@@ -271,6 +291,17 @@ btn3_kasi.grid(row=3, columnspan=2, pady=10, padx=10)
 if path.exists('data/joogimeister.txt'):
     with open('data/joogimeister.txt') as json_file:
         data_joogid = json.load(json_file)
+        vars.phone_map_jook = data_joogid['phone_map']
+        vars.juice_map_jook = data_joogid['juice_map']
+        vars.kitchen_map_jook = data_joogid['kitchen_map']
+        vars.cellar_map_jook = data_joogid['cellar_map']
+        vars.aerator_map_jook = data_joogid['aerator_map']
+        vars.distiller_map_jook = data_joogid['distiller_map']
+        vars.cider_map_jook = data_joogid['cider_map']
+        vars.blender_map_jook = data_joogid['blender_map']
+        vars.item_to_ingredients_map_jook = data_joogid['item_to_ingredients_map']
+        vars.item_to_value_map_jook = data_joogid['item_to_value_map']
+        vars.item_names_jook = data_joogid['item_names']
 
 dropdown_joogimeister = tk.StringVar()
 dropdown_joogimeister.set(data_joogid['item_names'][0])

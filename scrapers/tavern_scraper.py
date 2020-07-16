@@ -72,10 +72,10 @@ def scrapeTavernData(driver, close_after=True):
         item_to_value_map[item[0]] = str(item[1])
         item_names.append(item[0])
 
-    data['tugi_map'] = phone_map
+    data['phone_map'] = phone_map
     data['juice_map'] = juice_map
     data['kitchen_map'] = kitchen_map
-    data['ahi_map'] = cellar_map
+    data['cellar_map'] = cellar_map
     data['aerator_map'] = aerator_map
     data['distiller_map'] = distiller_map
     data['cider_map'] = cider_map
