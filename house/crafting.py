@@ -1,12 +1,9 @@
-import threading
 import time
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-from multiprocessing import Process
 
 from utils import constants, captcha_solver, error_handler, vars
 
@@ -57,11 +54,11 @@ def kasitoo(driver, action, item, counter=0, item_craft_cnt=0, max_errors=1000, 
 
             if driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
                 print('materjal otsas')
-                restock(driver, vars.item_to_ingredients_map_kasitoo[item])  #restock(item_to_material_map[item_value])
+                restock(driver, vars.item_to_ingredients_map_kasitoo[item])
                 kasitoo(driver, action, item, counter, item_craft_cnt, token=token)
 
             if vars.stop_thread:
-                print('thread is signaled to stop')
+                print('thread was signaled to stop')
                 break
 
             else:

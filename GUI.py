@@ -12,15 +12,14 @@ from os import path
 import time
 import threading
 
-from multiprocessing import Process
-
-from scrapers import crafting_scraper
-from scrapers import tavern_scraper
+from scrapers import crafting_scraper, tavern_scraper, blacksmith_scraper
 from utils import credentials_handler, constants, vars
 from house import crafting, blacksmithing, herbalism
 from tavern import barkeeping
 
+
 t = threading.Thread()
+
 
 def startDriverAndLogin(world='white'):
     global driver
@@ -48,7 +47,10 @@ def changeProcess():
         getSelectionKasi(change=True)
 
     elif tab == 'Joogimeister':
-        getSelectionJook()
+        getSelectionJook(True)
+
+    elif tab == 'Sepikoda':
+        getSelectionSepikoda(True)
 
 
 def stopProcess():
@@ -66,6 +68,9 @@ def disableButtons():
     btn1_jook['state'] = 'normal'
     btn2_jook['state'] = 'disabled'
     btn3_jook['state'] = 'disabled'
+    btn1_sepikoda['state'] = 'normal'
+    btn2_sepikoda['state'] = 'disabled'
+    btn3_sepikoda['state'] = 'disabled'
 
 
 def enableButtons():
@@ -75,9 +80,12 @@ def enableButtons():
     btn1_kasi['state'] = 'disabled'
     btn2_kasi['state'] = 'normal'
     btn3_kasi['state'] = 'normal'
+    btn1_sepikoda['state'] = 'disabled'
+    btn2_sepikoda['state'] = 'normal'
+    btn3_sepikoda['state'] = 'normal'
 
 
-def getSelectionJook():
+def getSelectionJook(change=False):
     global chosen_option
     chosen_option = dropdown_joogimeister.get()
     if chosen_option in data_joogid['kitchen_map']:
@@ -102,7 +110,7 @@ def getSelectionKasi(change=False):
     if not change:
         startDriverAndLogin()
     elif change:
-        print('trying to change action')
+        print('trying to change action from käsitöö')
         print('new item to make: ' + chosen_option)
         vars.stop_thread = True
         t.join(2)
@@ -111,15 +119,35 @@ def getSelectionKasi(change=False):
     if chosen_option in vars.puit_map:
         t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_PUIT, chosen_option,), kwargs={'token': token})
         t.start()
-        #crafting.kasitoo(driver, constants.TEGEVUS_PUIT, chosen_option, token=token)
     elif chosen_option in vars.tugi_map:
         t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_TUGI, chosen_option,), kwargs={'token': token})
         t.start()
-        #crafting.kasitoo(driver, constants.TEGEVUS_TUGI, chosen_option, token=token)
     elif chosen_option in vars.ahi_map:
         t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_AHI, chosen_option,), kwargs={'token': token})
         t.start()
-        #crafting.kasitoo(driver, constants.TEGEVUS_AHI, chosen_option, token=token)
+
+
+def getSelectionSepikoda(change=False):
+    global chosen_option, t
+    chosen_option = dropdown_menu_sepikoda.get()
+    restock_amount = 5000
+    qty_amount = '1'
+    print(chosen_option)
+    restock_amount = restock_entry.get()
+    qty_amount = qty_entry.get()
+
+    if not change:
+        startDriverAndLogin()
+    elif change:
+        print('trying to change action from sepikoda')
+        print('new item to make: ' + chosen_option)
+        vars.stop_thread = True
+        t.join(2)
+
+    vars.stop_thread = False
+
+    t = threading.Thread(target=blacksmithing.sepikoda, args=(driver, constants.TEGEVUS_ALAS, chosen_option, qty_amount,), kwargs={'token': token, 'remake': int(restock_amount)})
+    t.start()
 
 
 def getTabTitle():
@@ -136,6 +164,7 @@ def getAllData():
 
     crafting_scraper.scrapeCraftingInfo(driver, close_after=False)
     tavern_scraper.scrapeTavernData(driver)
+    blacksmith_scraper.readData()
     disableButtons()
 
 
@@ -151,6 +180,10 @@ def getTavernData():
     disableButtons()
 
 
+def getBlacksmithData():
+    blacksmith_scraper.readData()
+
+
 driver = None
 chosen_option = None
 window = tk.Tk()
@@ -164,6 +197,9 @@ tabControl.add(tab2, text='Käsitöö')
 
 tab3 = ttk.Frame(tabControl)
 tabControl.add(tab3, text='Joogimeister')
+
+tab4 = ttk.Frame(tabControl)
+tabControl.add(tab4, text='Sepikoda')
 tabControl.grid(row=3, columnspan=3, pady=10, padx=10)
 
 
@@ -191,8 +227,11 @@ btn_get_crafting.grid(row=4, column=0, pady=10, padx=10)
 btn_get_tavern = Button(window, text='Get Tavern Data', command=getTavernData)
 btn_get_tavern.grid(row=4, column=1, sticky=W, padx=10, pady=10)
 
+btn_get_blacksmith = Button(window, text='Get Blacksmith Data', command=getBlacksmithData())
+btn_get_blacksmith.grid(row=4, column=2, sticky=W, padx=10, pady=10)
+
 btn_get_all = Button(window, text='Get all Data', command=getAllData)
-btn_get_all.grid(row=5, column=0, sticky=W, pady=10, padx=10)
+btn_get_all.grid(row=5, column=1, sticky=W, pady=10, padx=10)
 
 if path.exists('config.txt'):
     username, password, token = credentials_handler.getCredentials()
@@ -245,10 +284,47 @@ btn2_jook.grid(row=2, column=1, pady=10, padx=10)
 btn3_jook = Button(tab3, text='Stop', command=stopProcess)
 btn3_jook.grid(row=3, columnspan=2, pady=10, padx=10)
 
+
+#### LOAD IN BLACKSMITHING DATA
+if path.exists('data/sepikoda.txt'):
+    with open('data/sepikoda.txt') as json_file:
+        data_sepikoda = json.load(json_file)
+        vars.item_names_sepikoda = data_sepikoda['item_names']
+        vars.item_to_value_map_sepikoda = data_sepikoda['item_to_value_map']
+        vars.weapon_to_item_map_sepikoda = data_sepikoda['weapon_to_item_map']
+
+dropdown_sepikoda = tk.StringVar()
+dropdown_sepikoda.set(data_sepikoda['item_names'][0])
+dropdown_menu_sepikoda = ttk.Combobox(tab4, textvariable=dropdown_sepikoda, values=data_sepikoda['item_names'], width=50)
+dropdown_menu_sepikoda.grid(row=0, columnspan=3)
+
+btn1_sepikoda = Button(tab4, text='Start', command=getSelectionSepikoda)
+btn1_sepikoda.grid(row=2, column=0, pady=10, padx=10)
+btn2_sepikoda = Button(tab4, text='Change item (choose new item first from dropdown)', command=changeProcess)
+btn2_sepikoda.grid(row=2, column=1, pady=10, padx=10)
+btn3_sepikoda = Button(tab4, text='Stop', command=stopProcess)
+btn3_sepikoda.grid(row=3, columnspan=2, pady=10, padx=10)
+
+Label(tab4, text="Qty at once").grid(row=1, column=0)
+qty_entry = Entry(tab4)
+qty_entry.grid(row=1, column=1, sticky=W)
+qty_entry['width'] = 5
+qty_entry.insert(0, '1')
+
+Label(tab4, text="Restock amount").grid(row=1, column=2, sticky=E)
+restock_entry = Entry(tab4)
+restock_entry.grid(row=1, column=3, sticky=W)
+restock_entry['width'] = 10
+restock_entry.insert(0, 5000)
+
+
+
 #print(btn2_jook)
 btn2_kasi['state'] = 'disabled'
 btn3_kasi['state'] = 'disabled'
 btn2_jook['state'] = 'disabled'
 btn3_jook['state'] = 'disabled'
+btn2_sepikoda['state'] = 'disabled'
+btn3_sepikoda['state'] = 'disabled'
 
 window.mainloop()
