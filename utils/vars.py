@@ -10,6 +10,7 @@ item_to_ingredients_map_kasitoo = {}
 item_to_value_map_kasitoo = {}
 item_names_kasitoo = ['-No data found-']
 ingredient_to_kapp_map = {}
+level_to_item_map_kasitoo = {}
 
 # barkeeping vars
 phone_map_jook = {}
@@ -22,11 +23,13 @@ cider_map_jook = {}
 blender_map_jook = {}
 item_to_ingredients_map_jook = {}
 item_to_value_map_jook = {}
-item_names_jook = []
+item_names_jook = ['-No data found-']
+level_to_item_map_jook = {}
 
 # blacksmith vars
 weapon_to_item_map_sepikoda = {}
 item_names_sepikoda = ['-No data found-']
 item_to_value_map_sepikoda = {}
+level_to_item_map_sepikoda = {}
 
 stop_thread = False

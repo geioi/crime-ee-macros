@@ -56,6 +56,7 @@ def scrapeCraftingInfo(driver, close_after=True):
     item_to_ingredients_map = {}
     item_to_value_map = {}
     item_names = []
+    level_to_item_map = {}
 
     sorted_items = sorted(items, key=itemgetter(1))
     for item in sorted_items:
@@ -70,6 +71,10 @@ def scrapeCraftingInfo(driver, close_after=True):
         item_to_value_map[item[0]] = str(item[1])
         item_names.append(item[0])
 
+        level = item[0].split(' - ')[0].split(' ')[1]
+        level_to_item_map[level] = item[0]
+
+
     data['tugi_map'] = tugi_map
     data['kapp_map'] = kapp_map
     data['puit_map'] = puit_map
@@ -78,6 +83,7 @@ def scrapeCraftingInfo(driver, close_after=True):
     data['item_to_value_map'] = item_to_value_map
     data['item_names'] = item_names
     data['ingredient_to_kapp_map'] = ingredient_to_kapp_map
+    data['level_to_item_map'] = level_to_item_map
 
     with open('data/kasitoo.txt', 'w') as outfile:
         json.dump(data, outfile)

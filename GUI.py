@@ -88,6 +88,7 @@ def enableButtons():
 def getSelectionJook(change=False):
     global chosen_option, t
     chosen_option = dropdown_joogimeister.get()
+    autolevel = autolevel_jook.get()
     if not change:
         startDriverAndLogin()
     elif change:
@@ -98,35 +99,40 @@ def getSelectionJook(change=False):
 
     vars.stop_thread = False
 
+    #barkeeping.emptyWares(driver, ['Sidrunimahl', 'Kirsid', 'Jõhvikad', 'Tume viinamarjamahl'])
+    #barkeeping.restock(driver, ['Piiritus'], token)
+    #exit()
+
     if chosen_option in vars.kitchen_map_jook:
         t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_KITCHEN, chosen_option,),
-                             kwargs={'token': token})
+                             kwargs={'token': token, 'autolevel': autolevel})
         t.start()
     elif chosen_option in vars.cellar_map_jook:
         t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_CELLAR, chosen_option,),
-                             kwargs={'token': token})
+                             kwargs={'token': token, 'autolevel': autolevel})
         t.start()
     elif chosen_option in vars.aerator_map_jook:
         t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_AERATOR, chosen_option,),
-                             kwargs={'token': token})
+                             kwargs={'token': token, 'autolevel': autolevel})
         t.start()
     elif chosen_option in vars.distiller_map_jook:
         t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_DISTILLER, chosen_option,),
-                             kwargs={'token': token})
+                             kwargs={'token': token, 'autolevel': autolevel})
         t.start()
     elif chosen_option in vars.cider_map_jook:
         t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_CIDER, chosen_option,),
-                             kwargs={'token': token})
+                             kwargs={'token': token, 'autolevel': autolevel})
         t.start()
     elif chosen_option in vars.blender_map_jook:
         t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_BLENDER, chosen_option,),
-                             kwargs={'token': token})
+                             kwargs={'token': token, 'autolevel': autolevel})
         t.start()
 
 
 def getSelectionKasi(change=False):
     global chosen_option, t
     chosen_option = dropdown_kasitoo.get()
+    autolevel = autolevel_kasi.get()
     if not change:
         startDriverAndLogin()
     elif change:
@@ -137,13 +143,13 @@ def getSelectionKasi(change=False):
 
     vars.stop_thread = False
     if chosen_option in vars.puit_map:
-        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_PUIT, chosen_option,), kwargs={'token': token})
+        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_PUIT, chosen_option,), kwargs={'token': token, 'autolevel': autolevel})
         t.start()
     elif chosen_option in vars.tugi_map:
-        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_TUGI, chosen_option,), kwargs={'token': token})
+        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_TUGI, chosen_option,), kwargs={'token': token, 'autolevel': autolevel})
         t.start()
     elif chosen_option in vars.ahi_map:
-        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_AHI, chosen_option,), kwargs={'token': token})
+        t = threading.Thread(target=crafting.kasitoo, args=(driver, constants.TEGEVUS_AHI, chosen_option,), kwargs={'token': token, 'autolevel': autolevel})
         t.start()
 
 
@@ -155,6 +161,7 @@ def getSelectionSepikoda(change=False):
     print(chosen_option)
     restock_amount = restock_entry.get()
     qty_amount = qty_entry.get()
+    autolevel = autolevel_sepikoda.get()
 
     if not change:
         startDriverAndLogin()
@@ -166,7 +173,7 @@ def getSelectionSepikoda(change=False):
 
     vars.stop_thread = False
 
-    t = threading.Thread(target=blacksmithing.sepikoda, args=(driver, constants.TEGEVUS_ALAS, chosen_option, qty_amount,), kwargs={'token': token, 'remake': int(restock_amount)})
+    t = threading.Thread(target=blacksmithing.sepikoda, args=(driver, constants.TEGEVUS_ALAS, chosen_option, qty_amount,), kwargs={'token': token, 'remake': int(restock_amount), 'autolevel': autolevel})
     t.start()
 
 
@@ -272,12 +279,16 @@ if path.exists('data/kasitoo.txt'):
         vars.item_to_value_map_kasitoo = data_kasitoo['item_to_value_map']
         vars.item_names_kasitoo = data_kasitoo['item_names']
         vars.ingredient_to_kapp_map = data_kasitoo['ingredient_to_kapp_map']
+        vars.level_to_item_map_kasitoo = data_kasitoo['level_to_item_map']
 
 
 dropdown_kasitoo = tk.StringVar()
 dropdown_kasitoo.set(vars.item_names_kasitoo[0])
 dropdown_menu_kasitoo = ttk.Combobox(tab2, textvariable=dropdown_kasitoo, values=data_kasitoo['item_names'], width=50)
 dropdown_menu_kasitoo.grid(row=0, columnspan=3)
+
+autolevel_kasi = IntVar()
+Checkbutton(tab2, text="Automatically move to next item when the level allows", variable=autolevel_kasi).grid(row=1, column=1, sticky=W)
 
 btn1_kasi = Button(tab2, text='Start', command=getSelectionKasi)
 btn1_kasi.grid(row=2, column=0, pady=10, padx=10)
@@ -302,11 +313,15 @@ if path.exists('data/joogimeister.txt'):
         vars.item_to_ingredients_map_jook = data_joogid['item_to_ingredients_map']
         vars.item_to_value_map_jook = data_joogid['item_to_value_map']
         vars.item_names_jook = data_joogid['item_names']
+        vars.level_to_item_map_jook = data_joogid['level_to_item_map']
 
 dropdown_joogimeister = tk.StringVar()
 dropdown_joogimeister.set(data_joogid['item_names'][0])
 dropdown_menu_joogimeister = ttk.Combobox(tab3, textvariable=dropdown_joogimeister, values=data_joogid['item_names'], width=50)
 dropdown_menu_joogimeister.grid(row=0, columnspan=3)
+
+autolevel_jook = IntVar()
+Checkbutton(tab3, text="Automatically move to next item when the level allows", variable=autolevel_jook).grid(row=1, column=1, sticky=W)
 
 btn1_jook = Button(tab3, text='Start', command=getSelectionJook)
 btn1_jook.grid(row=2, column=0, pady=10, padx=10)
@@ -323,18 +338,22 @@ if path.exists('data/sepikoda.txt'):
         vars.item_names_sepikoda = data_sepikoda['item_names']
         vars.item_to_value_map_sepikoda = data_sepikoda['item_to_value_map']
         vars.weapon_to_item_map_sepikoda = data_sepikoda['weapon_to_item_map']
+        vars.level_to_item_map_sepikoda = data_sepikoda['level_to_item_map']
 
 dropdown_sepikoda = tk.StringVar()
 dropdown_sepikoda.set(data_sepikoda['item_names'][0])
 dropdown_menu_sepikoda = ttk.Combobox(tab4, textvariable=dropdown_sepikoda, values=data_sepikoda['item_names'], width=50)
 dropdown_menu_sepikoda.grid(row=0, columnspan=3)
 
+autolevel_sepikoda = IntVar()
+Checkbutton(tab4, text="Automatically move to next item when the level allows", variable=autolevel_sepikoda).grid(row=2, column=1, sticky=W)
+
 btn1_sepikoda = Button(tab4, text='Start', command=getSelectionSepikoda)
-btn1_sepikoda.grid(row=2, column=0, pady=10, padx=10)
+btn1_sepikoda.grid(row=3, column=0, pady=10, padx=10)
 btn2_sepikoda = Button(tab4, text='Change item (choose new item first from dropdown)', command=changeProcess)
-btn2_sepikoda.grid(row=2, column=1, pady=10, padx=10)
+btn2_sepikoda.grid(row=3, column=1, pady=10, padx=10)
 btn3_sepikoda = Button(tab4, text='Stop', command=stopProcess)
-btn3_sepikoda.grid(row=3, columnspan=2, pady=10, padx=10)
+btn3_sepikoda.grid(row=4, columnspan=2, pady=10, padx=10)
 
 Label(tab4, text="Qty at once").grid(row=1, column=0)
 qty_entry = Entry(tab4)
@@ -349,8 +368,6 @@ restock_entry['width'] = 10
 restock_entry.insert(0, 5000)
 
 
-
-#print(btn2_jook)
 btn2_kasi['state'] = 'disabled'
 btn3_kasi['state'] = 'disabled'
 btn2_jook['state'] = 'disabled'

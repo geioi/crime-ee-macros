@@ -58,6 +58,7 @@ def scrapeTavernData(driver, close_after=True):
     item_to_ingredients_map = {}
     item_to_value_map = {}
     item_names = []
+    level_to_item_map = {}
 
     sorted_items = sorted(items, key=itemgetter(1))
     for item in sorted_items:
@@ -72,6 +73,9 @@ def scrapeTavernData(driver, close_after=True):
         item_to_value_map[item[0]] = str(item[1])
         item_names.append(item[0])
 
+        level = item[0].split(' - ')[0].split(' ')[1]
+        level_to_item_map[level] = item[0]
+
     data['phone_map'] = phone_map
     data['juice_map'] = juice_map
     data['kitchen_map'] = kitchen_map
@@ -83,6 +87,7 @@ def scrapeTavernData(driver, close_after=True):
     data['item_to_ingredients_map'] = item_to_ingredients_map
     data['item_to_value_map'] = item_to_value_map
     data['item_names'] = item_names
+    data['level_to_item_map'] = level_to_item_map
 
     with open('data/joogimeister.txt', 'w') as outfile:
         json.dump(data, outfile)

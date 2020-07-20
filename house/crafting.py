@@ -26,7 +26,15 @@ def restock(driver, values, amount_of_restock=150, restock_cnt=0):  # takes arra
         restock_cnt = 0
 
 
-def kasitoo(driver, action, item, counter=0, item_craft_cnt=0, max_errors=1000, token=None):
+def kasitoo(driver, action, item, counter=0, item_craft_cnt=0, max_errors=1000, token=None, autolevel=False, new_location=False):
+    if new_location:
+        if item in vars.ahi_map:
+            action = constants.TEGEVUS_AHI
+        elif item in vars.puit_map:
+            action = constants.TEGEVUS_PUIT
+        elif item in vars.tugi_map:
+            action = constants.TEGEVUS_TUGI
+
     driver.get(constants.BASE_URL + constants.ASUKOHT_MAJA + action)
 
     time.sleep(1)
@@ -35,6 +43,9 @@ def kasitoo(driver, action, item, counter=0, item_craft_cnt=0, max_errors=1000, 
     select.select_by_value(vars.item_to_value_map_kasitoo[item])
 
     captchaContainer = driver.find_element_by_id('captcha_container')
+
+    current_level = int(driver.find_element_by_id('s_crafting').text)
+    level_updated = int(driver.find_element_by_id('s_crafting').text)
 
     while True:
         try:
@@ -49,13 +60,33 @@ def kasitoo(driver, action, item, counter=0, item_craft_cnt=0, max_errors=1000, 
                     return
             else:
                 while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error') and not vars.stop_thread:
+                    if autolevel:
+                        if int(current_level) < int(level_updated):
+                            # gained a level
+                            print('Gained a level!!! Congrats!')
+                            if str(level_updated) in vars.level_to_item_map_kasitoo:
+                                kasitoo(driver, action, vars.level_to_item_map_kasitoo[str(level_updated)], counter, item_craft_cnt, max_errors, token,
+                                             autolevel, True)
+                            else:
+                                current_level = int(driver.find_element_by_id('s_crafting').text)
+
                     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
                     time.sleep(0.1)
+
+                    try:
+                        level_updated = int(driver.find_element_by_id('s_crafting').text)
+                    except:
+                        print('ei leidnud uut levelit')
+                        pass
 
             if driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
                 print('materjal otsas')
                 restock(driver, vars.item_to_ingredients_map_kasitoo[item])
-                kasitoo(driver, action, item, counter, item_craft_cnt, token=token)
+                driver.get(constants.BASE_URL + constants.ASUKOHT_MAJA + action)
+                time.sleep(1)
+                captchaContainer = driver.find_element_by_id('captcha_container')
+                continue
+                #kasitoo(driver, action, item, counter, item_craft_cnt, token=token)
 
             if vars.stop_thread:
                 print('thread was signaled to stop')
