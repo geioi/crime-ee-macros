@@ -99,10 +99,6 @@ def getSelectionJook(change=False):
 
     vars.stop_thread = False
 
-    #barkeeping.emptyWares(driver, ['Sidrunimahl', 'Kirsid', 'Jõhvikad', 'Tume viinamarjamahl'])
-    #barkeeping.restock(driver, ['Piiritus'], token)
-    #exit()
-
     if chosen_option in vars.kitchen_map_jook:
         t = threading.Thread(target=barkeeping.joogimeister, args=(driver, constants.ITEM_KITCHEN, chosen_option,),
                              kwargs={'token': token, 'autolevel': autolevel})
