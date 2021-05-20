@@ -6,6 +6,8 @@ ASUKOHT_KORTS = 'asukoht=tavern'
 ASUKOHT_SOOKLA = 'asukoht=tavern&korrus=2'
 ASUKOHT_TANAV = 'asukoht=tanav'
 ASUKOHT_SLUMM_TURG_CRFT = 'asukoht=slumm&paik=4&lett=2'
+ASUKOHT_BOTAANIKAAED = 'asukoht=baed'
+ASUKOHT_VARASTATUD_ESEMED = 'asukoht=kott&ese=6'
 #### END OF LOCATIONS ####
 
 
@@ -22,6 +24,11 @@ TEGEVUS_ALAS = '&tegevus=anvil'
 
 #drug lab
 TEGEVUS_RAVI = '&tegevus=ravipaki'
+
+#chemistry
+TEGEVUS_MAHLAPRESS = '&tegevus=squeezer'
+TEGEVUS_TOOLAUD = '&tegevus=drugmachine'
+TEGEVUS_LABORI_KAPP = '&tegevus=labsstorage'
 
 #tavern
 ITEM_PHONE = '#phone'

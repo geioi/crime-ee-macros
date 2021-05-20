@@ -32,4 +32,14 @@ item_names_sepikoda = ['-No data found-']
 item_to_value_map_sepikoda = {}
 level_to_item_map_sepikoda = {}
 
+# chemistry vars
+plant_to_value_map_chemistry = {}
+juice_to_value_map_chemistry = {}
+item_names_chemistry = ['-No data found-']
+narc_to_value_map_chemistry = {}
+level_to_item_map_chemistry = {}
+item_to_narc_map_chemistry = {}
+item_to_ready_narc_value_map_chemistry = {}
+item_to_juice_map_chemistry = {}
+
 stop_thread = False

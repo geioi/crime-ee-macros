@@ -21,7 +21,13 @@ def sendAPIRequest(image, token=None):
     solver.set_numeric(1)
     solver.set_key(token)
 
-    captcha_text = solver.solve_and_return_solution(image)
+    try:
+        captcha_text = solver.solve_and_return_solution(image)
+    except Exception as err:
+        print('Probably 500 error, trying again in 5 seconds')
+        time.sleep(5)
+        return sendAPIRequest(image, token=token)
+    print(captcha_text)
     if captcha_text != 0:
         print('captcha answer is: ' + captcha_text)
         return captcha_text
@@ -46,3 +52,9 @@ def solveCaptcha(driver, captchaContainer, token=None):
         time.sleep(1)
         if captchaContainer.value_of_css_property('display') == 'none':
             guessed = True
+
+def checkForCaptcha(driver, token=None):
+    if driver.find_elements_by_id('captcha_container'):
+        if not driver.find_element_by_id('captcha_container').value_of_css_property('display') == 'none':
+            solveCaptcha(driver, driver.find_element_by_id('captcha_container'), token)
+            return True
