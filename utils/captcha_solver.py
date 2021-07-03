@@ -7,7 +7,7 @@ from anticaptchaofficial.imagecaptcha import imagecaptcha
 
 
 def getPictureAnswer(link, token=None):
-    page = requests.get(link)
+    page = requests.get(link, timeout=0.1)
     b = page.content
     file_bytes = io.BytesIO(b)
     image = Image.open(file_bytes)
