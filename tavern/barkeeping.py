@@ -1,5 +1,6 @@
 import time
 
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
@@ -142,7 +143,7 @@ def makeAlcohol(driver, token, max_errors=1000):
         try:
             while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('div.bar_msg div#message-container p.message.error') and not vars.stop_thread:
                 WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
-                time.sleep(0.15)
+                time.sleep(0.13)
 
             if driver.find_elements_by_css_selector('div.bar_msg div#message-container p.message.error'):
                 print('materjal otsas')
@@ -204,8 +205,9 @@ def joogimeister(driver, action, item, max_errors=1000, token=None, autolevel=Fa
                         else:
                             current_level = int(driver.find_element_by_id('s_barkeeping').text)
 
-                WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
-                time.sleep(0.1)
+                WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'nupuke420'))).click()
+                #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
+                time.sleep(0.13)
                 try:
                     level_updated = int(driver.find_element_by_id('s_barkeeping').text)
                 except:
@@ -232,7 +234,8 @@ def joogimeister(driver, action, item, max_errors=1000, token=None, autolevel=Fa
 
             else:
                 captcha_solver.solveCaptcha(driver, captchaContainer, token)
-
+        except StaleElementReferenceException as uselessErr:
+            continue
         except Exception as error:
             error_handler.printError(driver, error, max_errors)
             continue

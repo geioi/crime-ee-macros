@@ -29,8 +29,14 @@ def startDriverAndLogin(world='white'):
 
     window.update_idletasks()
 
+    #set options so that the website can not tell that Selenium runs the window
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-blink-features")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--start-maximized")
+
     #start webdriver
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(options=options)
     driver.get('https://www.crime.ee')
     driver.find_element_by_id(world).click()
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, 'username5'))).send_keys(username)

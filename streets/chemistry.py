@@ -18,7 +18,7 @@ def stealPlants(driver, plants_value, steal_amount = 50, token = None, narc_to_b
     stolen_amount = 0
     while stolen_amount < steal_amount:
         driver.get(constants.BASE_URL + constants.ASUKOHT_BOTAANIKAAED)
-        time.sleep(0.15)
+        time.sleep(0.2)
 
         select_plant = Select(driver.find_element_by_name('varastataim'))
         select_plant.select_by_value(plants_value)
@@ -32,46 +32,46 @@ def stealPlants(driver, plants_value, steal_amount = 50, token = None, narc_to_b
             driver.find_element_by_xpath("//input[@value='Varasta taimed']").click()
             hasCaptcha = False
 
-        time.sleep(0.15)
+        time.sleep(0.2)
 
         driver.get(constants.BASE_URL + constants.ASUKOHT_MAJA + constants.TEGEVUS_LABORI_KAPP)
 
-        time.sleep(0.15)
+        time.sleep(0.2)
 
         driver.find_element_by_name('taimedkappi').click()
 
-        time.sleep(0.15)
+        time.sleep(0.2)
 
         hasCaptcha = captcha_solver.checkForCaptcha(driver, token)
         if hasCaptcha:
             driver.find_element_by_name('taimedkappi').click()
-            time.sleep(0.15)
+            time.sleep(0.2)
             hasCaptcha = False
 
         stolen_amount += 1
 
     driver.get(constants.BASE_URL + constants.ASUKOHT_MAJA + constants.TEGEVUS_MAHLAPRESS)
 
-    time.sleep(0.5)
+    time.sleep(0.3)
 
     driver.find_element_by_name('jsq_quantity').send_keys(str(1000))
     select_juice = Select(driver.find_element_by_name('jsq_plant'))
     select_juice.select_by_value(plants_value)
 
-    time.sleep(0.5)
+    time.sleep(0.3)
     for i in range(0, int((steal_amount * 100) / 1000), 1):
         driver.find_element_by_xpath("//input[@value='Valmista taimedest mahla']").click()
-        time.sleep(0.15)
+        time.sleep(0.2)
         hasCaptcha = captcha_solver.checkForCaptcha(driver, token)
         if hasCaptcha:
             driver.find_element_by_xpath("//input[@value='Valmista taimedest mahla']").click()
-            time.sleep(0.15)
+            time.sleep(0.2)
             hasCaptcha = False
 
 
     driver.get(constants.BASE_URL + constants.ASUKOHT_TANAV)
 
-    time.sleep(0.15)
+    time.sleep(0.2)
 
     driver.find_element_by_id('myy_narkot_' + narc_to_buy).click()
     driver.find_element_by_name('selldrugs').click()
@@ -82,7 +82,7 @@ def keemik(driver, item, backpack_size, max_errors=1000, token=None, autolevel=F
 
     time.sleep(1)
     captcha_solver.checkForCaptcha(driver, token)
-    time.sleep(0.15)
+    time.sleep(0.1)
 
     captchaContainer = driver.find_element_by_id('captcha_container')
 
@@ -126,13 +126,13 @@ def keemik(driver, item, backpack_size, max_errors=1000, token=None, autolevel=F
                     grams_field.send_keys(str(backpack_size))
 
                 driver.find_element_by_name('purcdrugs').click()
-                time.sleep(0.15)
+                time.sleep(0.1)
                 hasCaptcha = captcha_solver.checkForCaptcha(driver, token)
                 if hasCaptcha:
                     driver.find_element_by_name('purcdrugs').click()
                     hasCaptcha = False
 
-                time.sleep(0.15)
+                time.sleep(0.1)
 
                 driver.get(constants.BASE_URL + constants.ASUKOHT_MAJA + constants.TEGEVUS_TOOLAUD)
 
@@ -149,25 +149,25 @@ def keemik(driver, item, backpack_size, max_errors=1000, token=None, autolevel=F
                     select_juice.select_by_value(juice_to_use)
                 else:
                     print('could not find the required juice')
-                    time.sleep(0.15)
-                    stealPlants(driver, juice_to_use, 50, token, narc_to_buy=narc_to_buy)
+                    time.sleep(0.1)
+                    stealPlants(driver, juice_to_use, 100, token, narc_to_buy=narc_to_buy)
                     continue
                     #return
                 #return
 
-                time.sleep(0.15)
+                time.sleep(0.1)
 
                 driver.find_element_by_class_name('nupuke420').click()
-                time.sleep(0.15)
+                time.sleep(0.1)
                 hasCaptcha = captcha_solver.checkForCaptcha(driver, token)
                 if hasCaptcha:
                     driver.find_element_by_class_name('nupuke420').click()
                     hasCaptcha = False
-                time.sleep(0.15)
+                time.sleep(0.1)
                 if driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
                     print('not enough juice')
-                    time.sleep(0.15)
-                    stealPlants(driver, juice_to_use, 50, token, narc_to_buy=narc_to_buy)
+                    time.sleep(0.1)
+                    stealPlants(driver, juice_to_use, 100, token, narc_to_buy=narc_to_buy)
                     continue
                     #return
 
@@ -176,7 +176,7 @@ def keemik(driver, item, backpack_size, max_errors=1000, token=None, autolevel=F
                 driver.find_element_by_id('myy_narkot_' + narc_to_sell).click()
                 driver.find_element_by_name('selldrugs').click()
 
-                time.sleep(0.15)
+                time.sleep(0.1)
                 hasCaptcha = captcha_solver.checkForCaptcha(driver, token)
                 if hasCaptcha:
                     driver.find_element_by_name('selldrugs').click()
