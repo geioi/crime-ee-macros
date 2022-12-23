@@ -1,4 +1,4 @@
-BASE_URL = 'https://valge.crime.ee/index.php?'
+BASE_URL = 'https://punane.crime.ee/index.php?'
 
 #### LOCATIONS ####
 ASUKOHT_MAJA = 'asukoht=house'

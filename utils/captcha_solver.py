@@ -42,7 +42,7 @@ def solveCaptcha(driver, captchaContainer, token=None):
     guessed = False
     wrongAnswerCounter = 0
     while not guessed:
-        if wrongAnswerCounter > 15:
+        if wrongAnswerCounter > 8:
             driver.close()
             exit()
         src_image = driver.find_element_by_id('captcha_img').get_attribute('src')

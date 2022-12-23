@@ -22,7 +22,7 @@ from streets import chemistry
 t = threading.Thread()
 
 
-def startDriverAndLogin(world='white'):
+def startDriverAndLogin(world='red'):
     global driver
     #disable and enable buttons
     enableButtons()
@@ -39,9 +39,9 @@ def startDriverAndLogin(world='white'):
     driver = webdriver.Chrome(options=options)
     driver.get('https://www.crime.ee')
     driver.find_element_by_id(world).click()
-    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, 'username5'))).send_keys(username)
-    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, 'password5'))).send_keys(password)
-    driver.find_element_by_id('password5').send_keys(Keys.RETURN)
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, 'username6'))).send_keys(username)
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.ID, 'password6'))).send_keys(password)
+    driver.find_element_by_id('password6').send_keys(Keys.RETURN)
 
     time.sleep(1)
 

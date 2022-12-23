@@ -14,7 +14,7 @@ def checkStolenItems(driver):
     driver.find_element_by_name('bitems_identify').click()
     time.sleep(0.15)
 
-def stealPlants(driver, plants_value, steal_amount = 50, token = None, narc_to_buy = None):
+def stealPlants(driver, plants_value, steal_amount = 10, token = None, narc_to_buy = None):
     stolen_amount = 0
     while stolen_amount < steal_amount:
         driver.get(constants.BASE_URL + constants.ASUKOHT_BOTAANIKAAED)
@@ -54,12 +54,12 @@ def stealPlants(driver, plants_value, steal_amount = 50, token = None, narc_to_b
 
     time.sleep(0.3)
 
-    driver.find_element_by_name('jsq_quantity').send_keys(str(1000))
+    driver.find_element_by_name('jsq_quantity').send_keys(str(100))
     select_juice = Select(driver.find_element_by_name('jsq_plant'))
     select_juice.select_by_value(plants_value)
 
     time.sleep(0.3)
-    for i in range(0, int((steal_amount * 100) / 1000), 1):
+    for i in range(0, int((steal_amount * 100) / 100), 1):
         driver.find_element_by_xpath("//input[@value='Valmista taimedest mahla']").click()
         time.sleep(0.2)
         hasCaptcha = captcha_solver.checkForCaptcha(driver, token)
@@ -150,7 +150,7 @@ def keemik(driver, item, backpack_size, max_errors=1000, token=None, autolevel=F
                 else:
                     print('could not find the required juice')
                     time.sleep(0.1)
-                    stealPlants(driver, juice_to_use, 100, token, narc_to_buy=narc_to_buy)
+                    stealPlants(driver, juice_to_use, 10, token, narc_to_buy=narc_to_buy)
                     continue
                     #return
                 #return
@@ -167,7 +167,7 @@ def keemik(driver, item, backpack_size, max_errors=1000, token=None, autolevel=F
                 if driver.find_elements_by_css_selector('div#ajaxmessage div#message-container p.message.error'):
                     print('not enough juice')
                     time.sleep(0.1)
-                    stealPlants(driver, juice_to_use, 100, token, narc_to_buy=narc_to_buy)
+                    stealPlants(driver, juice_to_use, 10, token, narc_to_buy=narc_to_buy)
                     continue
                     #return
 

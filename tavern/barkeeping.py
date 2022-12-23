@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from datetime import datetime
 
 from utils import captcha_solver, constants, error_handler, vars
 
@@ -47,14 +48,19 @@ def restock(driver, ingredient_list, token=None, max_errors=1000):
 
     juices_amount = 0
     has_alcohol = 0
-    # do juices first, otherwise there might not be enough room for other components
+
     for ingredient in ingredient_list:
         if ingredient in vars.juice_map_jook:
             juices_amount += 1
+
+    # do juices first, otherwise there might not be enough room for other components
+    for ingredient in ingredient_list:
+        if ingredient in vars.juice_map_jook:
+
             select_material = Select(driver.find_element_by_id('mat'))
             select_material.select_by_value(vars.juice_map_jook[ingredient])
 
-            driver.find_element_by_id('quant').send_keys(str(juice_allowed_amount))
+            driver.find_element_by_id('quant').send_keys(str(juice_allowed_amount // juices_amount))
             time.sleep(0.5)
             driver.find_element_by_name('order_mat').click()
 
@@ -64,7 +70,7 @@ def restock(driver, ingredient_list, token=None, max_errors=1000):
             select_material = Select(driver.find_element_by_id('mpress_n'))
             select_material.select_by_value(vars.juice_map_jook[ingredient])
 
-            driver.find_element_by_id('mpress_a').send_keys(str(juice_allowed_amount))
+            driver.find_element_by_id('mpress_a').send_keys(str(juice_allowed_amount // juices_amount))
             time.sleep(0.5)
             driver.find_element_by_name('make_juice').click()
 
@@ -144,6 +150,15 @@ def makeAlcohol(driver, token, max_errors=1000):
             while captchaContainer.value_of_css_property('display') == 'none' and not driver.find_elements_by_css_selector('div.bar_msg div#message-container p.message.error') and not vars.stop_thread:
                 WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
                 time.sleep(0.13)
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                if (current_time > '02:28:00' and current_time < '02:30:00') or (current_time > '03:28:00' and current_time < '03:30:00'):
+                    print(current_time)
+                    print('Crime Factory server is about to restart, continuing in 5 minutes')
+                    time.sleep(600)
+                    driver.execute_script("location.reload(true);")
+                    time.sleep(5)
+                    joogimeister(driver, token, max_errors)
 
             if driver.find_elements_by_css_selector('div.bar_msg div#message-container p.message.error'):
                 print('materjal otsas')
@@ -208,6 +223,17 @@ def joogimeister(driver, action, item, max_errors=1000, token=None, autolevel=Fa
                 WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'nupuke420'))).click()
                 #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
                 time.sleep(0.13)
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                if (current_time > '02:28:00' and current_time < '02:30:00') or (current_time > '03:28:00' and current_time < '03:30:00'):
+                    print(current_time)
+                    print('Crime Factory server is about to restart, continuing in 5 minutes')
+                    time.sleep(600)
+                    # Do a hard refresh, just in case
+                    driver.execute_script("location.reload(true);")
+                    time.sleep(5)
+                    joogimeister(driver, action, item, max_errors, token, autolevel, new_location)
+
                 try:
                     level_updated = int(driver.find_element_by_id('s_barkeeping').text)
                 except:

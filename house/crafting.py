@@ -7,13 +7,23 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from utils import constants, captcha_solver, error_handler, vars
+from datetime import datetime
 
 
-def restock(driver, values, amount_of_restock=150, restock_cnt=0):  # takes array of values to buy
+def restock(driver, values, amount_of_restock=30, restock_cnt=0):  # takes array of values to buy
     wait_time = 0.15
     print(values)
     for value in values:
         while restock_cnt < amount_of_restock:
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            if (current_time > '02:28:00' and current_time < '02:30:00') or (current_time > '03:28:00' and current_time < '03:30:00'):
+                print(current_time)
+                print('Crime Factory server is about to restart, continuing in 5 minutes')
+                time.sleep(300)
+                driver.execute_script("location.reload(true);")
+                time.sleep(5)
+                restock(driver, values, 10, restock_cnt)
             driver.get(constants.BASE_URL + constants.ASUKOHT_SLUMM_TURG_CRFT + '&ese=' + vars.kapp_map[vars.ingredient_to_kapp_map[value]] + '#x')
             time.sleep(wait_time)
             WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.NAME, 'purchcrafitem'))).click()
@@ -55,7 +65,16 @@ def kasitoo(driver, action, item, counter=0, item_craft_cnt=0, max_errors=1000, 
                     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'nupuke420'))).click()
                     #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
                     item_craft_cnt += 1
-                    time.sleep(0.1)
+                    time.sleep(0.11)
+                    now = datetime.now()
+                    current_time = now.strftime("%H:%M:%S")
+                    if (current_time > '02:28:00' and current_time < '02:30:00') or (current_time > '03:28:00' and current_time < '03:30:00'):
+                        print(current_time)
+                        print('Crime Factory server is about to restart, continuing in 5 minutes')
+                        time.sleep(600)
+                        driver.execute_script("location.reload(true);")
+                        time.sleep(5)
+                        kasitoo(driver, action, item, counter, item_craft_cnt, max_errors, token, autolevel, new_location)
 
                 if item_craft_cnt == counter:
                     item_craft_cnt = 0
@@ -74,7 +93,16 @@ def kasitoo(driver, action, item, counter=0, item_craft_cnt=0, max_errors=1000, 
 
                     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'nupuke420'))).click()
                     #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CLASS_NAME, 'nupuke420'))).click()
-                    time.sleep(0.1)
+                    time.sleep(0.11)
+                    now = datetime.now()
+                    current_time = now.strftime("%H:%M:%S")
+                    if (current_time > '02:28:00' and current_time < '02:30:00') or (current_time > '03:28:00' and current_time < '03:30:00'):
+                        print(current_time)
+                        print('Crime Factory server is about to restart, continuing in 5 minutes')
+                        time.sleep(600)
+                        driver.execute_script("location.reload(true);")
+                        time.sleep(5)
+                        kasitoo(driver, action, item, counter, item_craft_cnt, max_errors, token, autolevel, new_location)
 
                     try:
                         level_updated = int(driver.find_element_by_id('s_crafting').text)
